@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           sub,
                           style: T.small.copyWith(
-                            color: C.gold,
+                            color: Colors.white70,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -146,22 +146,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 _Quick(
                   Icons.auto_awesome_outlined,
                   'المساعد',
-                  C.purple,
-                  C.purpleSoft,
+                  C.navy,
+                  C.navySoft,
                   () => go(context, const AssistantScreen()),
                 ),
                 _Quick(
                   Icons.account_balance_outlined,
                   'عن الجامعة',
-                  C.green,
-                  C.greenSoft,
+                  C.navy,
+                  C.navySoft,
                   () => go(context, const AboutScreen()),
                 ),
                 _Quick(
                   Icons.call_outlined,
                   'اتصل بنا',
-                  C.amber,
-                  C.amberSoft,
+                  C.navy,
+                  C.navySoft,
                   () => go(context, const ContactScreen()),
                 ),
               ],
@@ -278,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: Stat('طالب', '+50K', color: C.green, bg: C.greenSoft),
+                  child: Stat('طالب', '+50K', color: C.navy, bg: C.navySoft),
                 ),
                 SizedBox(width: 10),
                 Expanded(

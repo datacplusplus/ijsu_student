@@ -120,7 +120,7 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
                             Stat(
                               'نوع الدراسة',
                               'صباحي • مسائي',
-                              color: C.green,
+                              color: C.navy,
                               bg: C.greenSoft,
                             ),
                             Stat(

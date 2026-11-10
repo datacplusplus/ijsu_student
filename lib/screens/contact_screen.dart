@@ -32,8 +32,8 @@ class ContactScreen extends StatelessWidget {
                         child: _Action(
                           Icons.call_outlined,
                           'اتصال',
-                          C.green,
-                          C.greenSoft,
+                          C.navy,
+                          C.navySoft,
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -41,8 +41,8 @@ class ContactScreen extends StatelessWidget {
                         child: _Action(
                           Icons.chat_bubble_outline_rounded,
                           'واتساب',
-                          C.teal,
-                          C.tealSoft,
+                          C.navy,
+                          C.navySoft,
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -75,11 +75,7 @@ class ContactScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   const RowCard(
-                    leading: IconBox(
-                      Icons.location_on_outlined,
-                      color: C.red,
-                      bg: C.redSoft,
-                    ),
+                    leading: IconBox(Icons.location_on_outlined),
                     title: 'الموقع',
                     subtitle: 'بغداد • الحارثية • عرض على الخريطة',
                   ),

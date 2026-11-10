@@ -59,7 +59,7 @@ class _JoyScreenState extends State<JoyScreen> {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: C.ink,
+                  color: C.navy,
                   borderRadius: BorderRadius.circular(S.rLg),
                 ),
                 child: Stack(

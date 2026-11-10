@@ -161,10 +161,6 @@ class _LoginViewState extends State<LoginView> {
               style: T.small.copyWith(fontSize: 11.5),
             ),
           ],
-          const SizedBox(height: 32),
-          Text('عام', style: T.h3.copyWith(color: C.muted)),
-          const SizedBox(height: 4),
-          const _Settings(showLogout: false),
         ],
       ),
     );
@@ -344,7 +340,7 @@ class _Tile extends StatelessWidget {
   );
   @override
   Widget build(BuildContext context) => Material(
-    color: bg,
+    color: C.surface,
     borderRadius: BorderRadius.circular(S.r),
     child: InkWell(
       borderRadius: BorderRadius.circular(S.r),
@@ -355,7 +351,7 @@ class _Tile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, color: color),
+            Icon(icon, color: C.navy),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -365,7 +361,7 @@ class _Tile extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: T.small.copyWith(
-                    color: color,
+                    color: color == C.red ? C.red : C.ink2,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

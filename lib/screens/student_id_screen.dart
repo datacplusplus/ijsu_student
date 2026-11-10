@@ -191,7 +191,7 @@ class StudentIdScreen extends StatelessWidget {
                         child: Stat(
                           'الدراسة',
                           s.studyType,
-                          color: C.green,
+                          color: C.navy,
                           bg: C.greenSoft,
                         ),
                       ),

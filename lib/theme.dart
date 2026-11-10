@@ -21,14 +21,14 @@ class C {
   // Pastel accents
   static const green = Color(0xFF12A150);
   static const greenSoft = Color(0xFFE6F6EC);
-  static const purple = Color(0xFF6D4AE0);
-  static const purpleSoft = Color(0xFFF0EBFF);
+  static const purple = navy; // decorative accents folded into brand navy
+  static const purpleSoft = navySoft;
   static const amber = Color(0xFFB7791F);
   static const amberSoft = Color(0xFFFFF4DB);
   static const red = Color(0xFFE5484D);
   static const redSoft = Color(0xFFFDECEC);
-  static const teal = Color(0xFF0E8C8C);
-  static const tealSoft = Color(0xFFE2F5F4);
+  static const teal = navy;
+  static const tealSoft = navySoft;
 }
 
 /// Spacing & radius tokens.
@@ -40,43 +40,43 @@ class S {
 
 /// Text styles.
 class T {
-  static TextStyle get display => GoogleFonts.alexandria(
-    fontSize: 28,
-    fontWeight: FontWeight.w800,
+  static TextStyle get display => GoogleFonts.ibmPlexSansArabic(
+    fontSize: 26,
+    fontWeight: FontWeight.w700,
     color: C.ink,
     height: 1.35,
   );
-  static TextStyle get h1 => GoogleFonts.alexandria(
-    fontSize: 22,
-    fontWeight: FontWeight.w800,
+  static TextStyle get h1 => GoogleFonts.ibmPlexSansArabic(
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
     color: C.ink,
     height: 1.4,
   );
-  static TextStyle get h2 => GoogleFonts.alexandria(
-    fontSize: 18,
+  static TextStyle get h2 => GoogleFonts.ibmPlexSansArabic(
+    fontSize: 17,
     fontWeight: FontWeight.w700,
     color: C.ink,
     height: 1.45,
   );
-  static TextStyle get h3 => GoogleFonts.alexandria(
+  static TextStyle get h3 => GoogleFonts.ibmPlexSansArabic(
     fontSize: 15,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     color: C.ink,
     height: 1.55,
   );
-  static TextStyle get body => GoogleFonts.alexandria(
-    fontSize: 14,
+  static TextStyle get body => GoogleFonts.ibmPlexSansArabic(
+    fontSize: 14.5,
     fontWeight: FontWeight.w400,
     color: C.ink2,
-    height: 1.8,
+    height: 1.75,
   );
-  static TextStyle get small => GoogleFonts.alexandria(
-    fontSize: 12,
+  static TextStyle get small => GoogleFonts.ibmPlexSansArabic(
+    fontSize: 12.5,
     fontWeight: FontWeight.w400,
     color: C.muted,
     height: 1.5,
   );
-  static TextStyle get label => GoogleFonts.alexandria(
+  static TextStyle get label => GoogleFonts.ibmPlexSansArabic(
     fontSize: 12.5,
     fontWeight: FontWeight.w600,
     color: C.navy,
@@ -96,7 +96,7 @@ ThemeData buildTheme() {
     splashFactory: InkSparkle.splashFactory,
   );
   return base.copyWith(
-    textTheme: GoogleFonts.alexandriaTextTheme(
+    textTheme: GoogleFonts.ibmPlexSansArabicTextTheme(
       base.textTheme,
     ).apply(bodyColor: C.ink, displayColor: C.ink),
     appBarTheme: AppBarTheme(
@@ -121,7 +121,7 @@ ThemeData buildTheme() {
         borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: C.navy, width: 1.4),
       ),
-      hintStyle: GoogleFonts.alexandria(color: C.muted, fontSize: 14),
+      hintStyle: GoogleFonts.ibmPlexSansArabic(color: C.muted, fontSize: 14),
       prefixIconColor: C.muted,
       suffixIconColor: C.muted,
     ),
@@ -132,7 +132,7 @@ ThemeData buildTheme() {
         minimumSize: const Size.fromHeight(56),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        textStyle: GoogleFonts.alexandria(
+        textStyle: GoogleFonts.ibmPlexSansArabic(
           fontSize: 15.5,
           fontWeight: FontWeight.w700,
         ),
@@ -144,7 +144,7 @@ ThemeData buildTheme() {
         minimumSize: const Size.fromHeight(56),
         side: const BorderSide(color: C.line, width: 1.2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        textStyle: GoogleFonts.alexandria(
+        textStyle: GoogleFonts.ibmPlexSansArabic(
           fontSize: 15,
           fontWeight: FontWeight.w600,
         ),

@@ -18,22 +18,22 @@ class AboutScreen extends StatelessWidget {
       Icons.verified_outlined,
       'النزاهة',
       'الصدق والشفافية في التعامل',
-      C.green,
-      C.greenSoft,
+      C.navy,
+      C.navySoft,
     ),
     (
       Icons.lightbulb_outline_rounded,
       'الابتكار',
       'نشجع التفكير الإبداعي',
-      C.amber,
-      C.amberSoft,
+      C.navy,
+      C.navySoft,
     ),
     (
       Icons.diversity_3_outlined,
       'الشمولية',
       'بيئة تعليمية للجميع',
-      C.purple,
-      C.purpleSoft,
+      C.navy,
+      C.navySoft,
     ),
   ];
 
@@ -83,7 +83,7 @@ class AboutScreen extends StatelessWidget {
                         child: Stat(
                           'فروع',
                           '8',
-                          color: C.green,
+                          color: C.navy,
                           bg: C.greenSoft,
                         ),
                       ),

@@ -232,25 +232,24 @@ class Stat extends StatelessWidget {
     required this.color,
     required this.bg,
   });
+
+  /// Neutral by design: colour is kept only when it carries meaning
+  /// (green = good / paid, red = due). Everything else is ink on grey.
+  bool get _semantic => color == C.green || color == C.red;
+
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
     decoration: BoxDecoration(
-      color: bg,
+      color: C.surface,
       borderRadius: BorderRadius.circular(S.r),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: T.small.copyWith(color: color.withValues(alpha: .8)),
-        ),
+        Text(label, style: T.small),
         const SizedBox(height: 2),
-        Text(
-          value,
-          style: T.h2.copyWith(color: color, fontWeight: FontWeight.w800),
-        ),
+        Text(value, style: T.h2.copyWith(color: _semantic ? color : C.ink)),
       ],
     ),
   );
