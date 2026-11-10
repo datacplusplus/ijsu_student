@@ -24,8 +24,9 @@ final hasPassword = ValueNotifier<bool>(false);
 /// Lets any screen switch the bottom tab.
 final currentTab = ValueNotifier<int>(0);
 
-/// Whether the floating AI button is fully shown (it tucks away to the
-/// screen edge while the user scrolls, then comes back).
+/// Whether the floating AI button is fully out. At rest it stays tucked at
+/// the screen edge (out of the way); while the user scrolls it slides out,
+/// and it tucks back shortly after scrolling stops.
 final aiButtonShown = ValueNotifier<bool>(true);
 
 class Shell extends StatefulWidget {
@@ -50,6 +51,14 @@ class _ShellState extends State<Shell> {
   void initState() {
     super.initState();
     currentTab.value = widget.initialTab;
+    // Show it fully on launch so people notice it, then tuck it to the side.
+    aiButtonShown.value = true;
+    _tuckLater(const Duration(milliseconds: 2500));
+  }
+
+  void _tuckLater(Duration d) {
+    _showAgain?.cancel();
+    _showAgain = Timer(d, () => aiButtonShown.value = false);
   }
 
   @override
@@ -58,23 +67,16 @@ class _ShellState extends State<Shell> {
     super.dispose();
   }
 
-  /// Hide the AI button while scrolling down; bring it back when scrolling
-  /// up or 1.2 s after scrolling stops.
+  /// Moving (scrolling) → the AI button slides out from the side.
+  /// Stopped → it tucks back to the side 1.5 s later.
   bool _onScroll(ScrollNotification n) {
     if (n.metrics.axis != Axis.vertical) return false;
-    if (n is UserScrollNotification) {
-      if (n.direction == ScrollDirection.reverse) {
-        aiButtonShown.value = false;
-      } else if (n.direction == ScrollDirection.forward) {
-        aiButtonShown.value = true;
-      }
+    if (n is UserScrollNotification && n.direction != ScrollDirection.idle) {
+      _showAgain?.cancel();
+      aiButtonShown.value = true;
     }
     if (n is ScrollEndNotification) {
-      _showAgain?.cancel();
-      _showAgain = Timer(
-        const Duration(milliseconds: 1200),
-        () => aiButtonShown.value = true,
-      );
+      _tuckLater(const Duration(milliseconds: 1500));
     }
     return false;
   }
@@ -190,8 +192,8 @@ class _BottomBar extends StatelessWidget {
 /// • Glossy sphere look (radial highlight, rim light, layered shadows)
 /// • Idle: gentle float up/down + slowly turning sparkle
 /// • Slightly see-through so content behind is still visible
-/// • While scrolling it slides mostly off the screen edge (just a sliver
-///   stays visible to tap), then returns
+/// • At rest it is tucked at the screen edge (a sliver stays visible to tap);
+///   while scrolling it slides out, then tucks back
 class HelpChatButton extends StatefulWidget {
   const HelpChatButton({super.key});
   @override
@@ -231,10 +233,10 @@ class _HelpChatButtonState extends State<HelpChatButton>
       builder: (_, shown, child) => AnimatedSlide(
         duration: const Duration(milliseconds: 380),
         curve: Curves.easeOutCubic,
-        offset: shown ? Offset.zero : Offset(rtl ? -.62 : .62, 0),
+        offset: shown ? Offset.zero : Offset(rtl ? -.78 : .78, 0),
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
-          opacity: shown ? .94 : .55,
+          opacity: shown ? .94 : .6,
           child: child,
         ),
       ),
