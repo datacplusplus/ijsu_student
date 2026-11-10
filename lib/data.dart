@@ -304,6 +304,11 @@ class Offer {
   final int discount, usesLeft, usesTotal;
   final IconData icon;
   final Color color, soft;
+
+  /// Distance from campus, students who used it this week, new badge.
+  final String distance;
+  final int usedBy;
+  final bool isNew;
   const Offer(
     this.shop,
     this.category,
@@ -314,18 +319,30 @@ class Offer {
     this.usesTotal,
     this.icon,
     this.color,
-    this.soft,
-  );
+    this.soft, {
+    this.distance = '',
+    this.usedBy = 0,
+    this.isNew = false,
+  });
 }
 
+/// Joy categories: (name, icon, has new offers).
 const offerCategories = [
-  'الكل',
-  'مطاعم',
-  'مكتبات',
-  'مقاهي',
-  'إلكترونيات',
-  'ملابس',
+  ('الكل', Icons.apps_rounded, false),
+  ('مطاعم', Icons.restaurant_outlined, true),
+  ('مقاهي', Icons.local_cafe_outlined, true),
+  ('مكتبات', Icons.menu_book_outlined, false),
+  ('إلكترونيات', Icons.laptop_mac_outlined, false),
+  ('ملابس', Icons.checkroom_outlined, true),
+  ('رياضة', Icons.fitness_center_outlined, false),
 ];
+
+// Shop brand colours (Joy is the one place colour identifies a shop).
+const _orange = Color(0xFFE8833A), _orangeSoft = Color(0xFFFDEEDF);
+const _rose = Color(0xFFD6457A), _roseSoft = Color(0xFFFBE6EE);
+const _teal = Color(0xFF0E8C8C), _tealSoft = Color(0xFFE2F5F4);
+const _indigo = Color(0xFF4F6BD8), _indigoSoft = Color(0xFFE9EDFC);
+const _brown = Color(0xFF8B5E3C), _brownSoft = Color(0xFFF3E9E1);
 
 const offers = [
   Offer(
@@ -337,8 +354,10 @@ const offers = [
     2,
     3,
     Icons.menu_book_outlined,
-    C.amber,
-    C.amberSoft,
+    _orange,
+    _orangeSoft,
+    distance: '350 م',
+    usedBy: 214,
   ),
   Offer(
     'مطعم البيت البغدادي',
@@ -351,6 +370,9 @@ const offers = [
     Icons.restaurant_outlined,
     C.red,
     C.redSoft,
+    distance: '600 م',
+    usedBy: 486,
+    isNew: true,
   ),
   Offer(
     'كافيه ركن القهوة',
@@ -361,8 +383,10 @@ const offers = [
     1,
     4,
     Icons.local_cafe_outlined,
-    C.teal,
-    C.tealSoft,
+    _brown,
+    _brownSoft,
+    distance: '120 م',
+    usedBy: 932,
   ),
   Offer(
     'تك ستور',
@@ -373,8 +397,10 @@ const offers = [
     1,
     1,
     Icons.laptop_mac_outlined,
-    C.navy,
-    C.navySoft,
+    _indigo,
+    _indigoSoft,
+    distance: '1.2 كم',
+    usedBy: 77,
   ),
   Offer(
     'أزياء الأناقة',
@@ -385,11 +411,49 @@ const offers = [
     3,
     3,
     Icons.checkroom_outlined,
-    C.purple,
-    C.purpleSoft,
+    _rose,
+    _roseSoft,
+    distance: '900 م',
+    usedBy: 158,
+    isNew: true,
+  ),
+  Offer(
+    'نادي القوة الرياضي',
+    'رياضة',
+    'اشتراك شهري بسعر الطلبة',
+    '31 كانون الأول',
+    35,
+    1,
+    1,
+    Icons.fitness_center_outlined,
+    _teal,
+    _tealSoft,
+    distance: '1.5 كم',
+    usedBy: 63,
+  ),
+  Offer(
+    'برغر ستيشن',
+    'مطاعم',
+    'وجبة الطالب مع مشروب مجاناً',
+    '25 تشرين الثاني',
+    40,
+    2,
+    2,
+    Icons.lunch_dining_outlined,
+    _orange,
+    _orangeSoft,
+    distance: '450 م',
+    usedBy: 1204,
+    isNew: true,
   ),
 ];
 
+/// Today's flash deal (ends at midnight, limited claims).
+final flashDeal = offers[6];
+const flashClaimed = .72;
+
+/// Student's Joy points / level (demo).
+const joyPoints = 420, joyNextLevel = 500;
 // ───────────────────────── Contact / FAQ ─────────────────────────
 const faqs = [
   (

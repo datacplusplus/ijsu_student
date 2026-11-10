@@ -204,7 +204,32 @@ class _OfferQrScreenState extends State<OfferQrScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: C.goldSoft,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🎁', style: TextStyle(fontSize: 16)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'تحصل على +10 نقاط Joy بعد استخدام العرض',
+                          style: T.small.copyWith(
+                            color: C.ink,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   Text(
                     'اعرض الرمز للبائع ليمسحه قبل الدفع • صالح حتى ${o.validUntil}',
                     textAlign: TextAlign.center,
