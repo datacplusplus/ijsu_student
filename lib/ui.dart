@@ -675,3 +675,53 @@ class SelectField extends StatelessWidget {
     ),
   );
 }
+
+/// Circular progress ring with the percentage in the middle.
+class ProgressRing extends StatelessWidget {
+  final double value; // 0..1
+  final double size;
+  final Color color;
+  final String? caption;
+  const ProgressRing({
+    super.key,
+    required this.value,
+    this.size = 96,
+    this.color = C.navy,
+    this.caption,
+  });
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: size,
+    height: size,
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox.expand(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: value),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeOutCubic,
+            builder: (_, v, _) => CircularProgressIndicator(
+              value: v,
+              strokeWidth: size * .1,
+              strokeCap: StrokeCap.round,
+              backgroundColor: C.line,
+              color: color,
+            ),
+          ),
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${(value * 100).round()}%',
+              style: T.h2.copyWith(fontSize: size * .2),
+            ),
+            if (caption != null)
+              Text(caption!, style: T.small.copyWith(fontSize: 10.5)),
+          ],
+        ),
+      ],
+    ),
+  );
+}

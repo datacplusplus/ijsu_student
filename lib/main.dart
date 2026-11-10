@@ -13,6 +13,7 @@ import 'screens/department_screen.dart';
 import 'screens/news_detail_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/offer_qr_screen.dart';
+import 'screens/schedule_screen.dart';
 import 'screens/shell.dart';
 import 'screens/student_id_screen.dart';
 import 'theme.dart';
@@ -45,6 +46,7 @@ Widget _start() {
     'notifications' => const NotificationsScreen(),
     'id' => const StudentIdScreen(),
     'balance' => const BalanceScreen(),
+    'schedule' => const ScheduleScreen(),
     'qr' => OfferQrScreen(offer: offers[0]),
     'register' => RegisterScreen(
       initialStep: ((int.tryParse(q['step'] ?? '1') ?? 1) - 1).clamp(0, 2),

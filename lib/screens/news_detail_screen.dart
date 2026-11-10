@@ -19,9 +19,52 @@ class NewsDetailScreen extends StatelessWidget {
               children: [
                 Image.asset(
                   item.image,
-                  height: 320 + top,
+                  height: 380 + top,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                ),
+                // Dark fade so the headline on the photo stays readable
+                Positioned.fill(
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0x550B1220),
+                          Colors.transparent,
+                          Color(0xE60B1220),
+                        ],
+                        stops: [0, .35, 1],
+                      ),
+                    ),
+                  ),
+                ),
+                // Category · time · headline on the photo
+                Positioned(
+                  left: S.page,
+                  right: S.page,
+                  bottom: 48,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Tag(item.category),
+                          const SizedBox(width: 10),
+                          Text(
+                            item.date,
+                            style: T.small.copyWith(color: Colors.white70),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        item.title,
+                        style: T.h1.copyWith(color: Colors.white, height: 1.5),
+                      ),
+                    ],
+                  ),
                 ),
                 Positioned(
                   top: top + 8,
@@ -50,10 +93,6 @@ class NewsDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Tag(item.category, color: C.navy, bg: C.navySoft),
-                  const SizedBox(height: 12),
-                  Text(item.title, style: T.h1),
-                  const SizedBox(height: 14),
                   Row(
                     children: [
                       const Logo(size: 34),

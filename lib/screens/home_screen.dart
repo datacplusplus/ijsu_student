@@ -18,23 +18,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _slide = 0;
 
-  static const _slides = [
-    (
-      '$img/hero_graduate.jpg',
-      'منارة العلم والمعرفة',
-      'ابدأ رحلتك الجامعية معنا',
-    ),
-    ('$img/library.jpg', 'مكتبة الجامعة', 'آلاف المصادر بين يديك'),
-    ('$img/news_honor.jpg', 'تكريم الطلبة الأوائل', 'نحتفي بتفوق طلبتنا'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final top = news.take(3).toList();
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.only(bottom: 28),
         children: [
-          // ── Header ──
+          // ── Header: greeting + date ──
           Padding(
             padding: const EdgeInsets.fromLTRB(S.page, 10, S.page, 14),
             child: Row(
@@ -42,30 +33,36 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Logo(size: 44),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'جامعة الإمام جعفر الصادق',
-                        style: T.h3.copyWith(fontSize: 14.5),
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'فرع بغداد',
-                            style: T.small.copyWith(
-                              color: C.gold,
-                              fontWeight: FontWeight.w700,
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: loggedIn,
+                    builder: (_, isIn, _) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isIn
+                              ? 'صباح الخير، ${student.first}'
+                              : 'جامعة الإمام جعفر الصادق',
+                          style: T.h3.copyWith(fontSize: 15.5),
+                        ),
+                        Row(
+                          children: [
+                            Text('الثلاثاء 10 تشرين الثاني • ', style: T.small),
+                            Text(
+                              'فرع بغداد',
+                              style: T.small.copyWith(
+                                color: C.navy,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          const Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 16,
-                            color: C.gold,
-                          ),
-                        ],
-                      ),
-                    ],
+                            const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 16,
+                              color: C.navy,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 RoundButton(
@@ -76,34 +73,58 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: S.page),
+            child: SearchField('ابحث عن كلية، خبر أو خدمة...'),
+          ),
+          const SizedBox(height: 22),
 
-          // ── Hero slider ──
+          // ── Top stories carousel ──
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: S.page),
+            child: Section(
+              'أبرز الأخبار',
+              action: 'عرض الكل',
+              onAction: () => currentTab.value = 3,
+            ),
+          ),
           SizedBox(
-            height: 210,
+            height: 230,
             child: PageView.builder(
-              controller: PageController(viewportFraction: .9),
-              padEnds: true,
-              itemCount: _slides.length,
+              controller: PageController(viewportFraction: .88),
+              padEnds: false,
+              itemCount: top.length,
               onPageChanged: (i) => setState(() => _slide = i),
               itemBuilder: (_, i) {
-                final (src, title, sub) = _slides[i];
+                final n = top[i];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsetsDirectional.only(
+                    start: i == 0 ? S.page : 6,
+                    end: 6,
+                  ),
                   child: PhotoCard(
-                    src: src,
-                    height: 210,
+                    src: n.image,
+                    height: 230,
+                    onTap: () => go(context, NewsDetailScreen(item: n)),
+                    badge: Tag(n.category),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          sub,
-                          style: T.small.copyWith(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w700,
+                          n.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: T.h2.copyWith(
+                            color: Colors.white,
+                            height: 1.5,
                           ),
                         ),
-                        Text(title, style: T.h1.copyWith(color: Colors.white)),
+                        const SizedBox(height: 4),
+                        Text(
+                          n.date,
+                          style: T.small.copyWith(color: Colors.white70),
+                        ),
                       ],
                     ),
                   ),
@@ -115,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              _slides.length,
+              top.length,
               (i) => AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -204,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     src: c.image,
                     height: 170,
                     onTap: () => currentTab.value = 1,
-                    badge: Tag('${c.departments.length} أقسام'),
+                    badge: Tag(deptCount(c.departments.length)),
                     child: Text(
                       c.name,
                       style: T.h3.copyWith(color: Colors.white, fontSize: 16),
@@ -216,36 +237,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 28),
 
-          // ── Latest news ──
+          // ── For you (news list) ──
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: S.page),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Section(
-                  'آخر الأخبار',
+                  'لك',
                   action: 'عرض الكل',
                   onAction: () => currentTab.value = 3,
                 ),
-                GestureDetector(
-                  onTap: () => go(context, NewsDetailScreen(item: news[0])),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Photo(news[0].image, height: 190, width: double.infinity),
-                      const SizedBox(height: 12),
-                      Text(news[0].category, style: T.label),
-                      Text(news[0].title, style: T.h2),
-                      const SizedBox(height: 4),
-                      Text(news[0].date, style: T.small),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-                for (final n in news.sublist(1, 3)) ...[
-                  const Hairline(),
-                  NewsRow(n),
-                ],
+                for (final n in news.skip(3)) ...[NewsRow(n), const Hairline()],
               ],
             ),
           ),
@@ -508,8 +511,6 @@ class _StudentSummary extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text('أهلاً ${student.first} 👋', style: T.h2),
-      const SizedBox(height: 12),
       Row(
         children: [
           Expanded(
@@ -558,24 +559,41 @@ class NewsRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Photo(n.image, width: 96, height: 96, radius: 18),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(n.category, style: T.label.copyWith(fontSize: 11.5)),
-                Text(
-                  n.title,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: T.h3.copyWith(fontSize: 14),
+                Row(
+                  children: [
+                    const Logo(size: 16),
+                    const SizedBox(width: 6),
+                    Text(n.category, style: T.label.copyWith(fontSize: 11.5)),
+                  ],
                 ),
                 const SizedBox(height: 4),
-                Text(n.date, style: T.small),
+                Text(
+                  n.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: T.h3.copyWith(fontSize: 14.5),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.schedule_rounded,
+                      size: 13,
+                      color: C.muted,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(n.date, style: T.small.copyWith(fontSize: 11.5)),
+                  ],
+                ),
               ],
             ),
           ),
-          const SizedBox(width: 14),
-          Photo(n.image, width: 92, height: 92, radius: 16),
         ],
       ),
     ),

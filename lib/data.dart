@@ -495,3 +495,10 @@ String iqd(int v) {
 
 /// Keeps numbers / emails / IDs left-to-right inside Arabic text.
 String ltr(String s) => '\u2066$s\u2069';
+
+/// Arabic count label for departments (1 → قسم واحد, 2 → قسمان, 3+ → N أقسام).
+String deptCount(int n) => n == 1
+    ? 'قسم واحد'
+    : n == 2
+    ? 'قسمان'
+    : '$n أقسام';

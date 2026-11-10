@@ -39,7 +39,7 @@ class _CollegesScreenState extends State<CollegesScreen> {
                     src: c.image,
                     height: 210,
                     badge: Tag(
-                      '${c.departments.length} أقسام',
+                      deptCount(c.departments.length),
                       icon: Icons.school_outlined,
                     ),
                     child: Text(

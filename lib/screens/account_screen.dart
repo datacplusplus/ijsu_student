@@ -10,6 +10,7 @@ import 'credentials_screen.dart';
 import 'register_screen.dart';
 import 'notifications_screen.dart';
 import 'shell.dart';
+import 'schedule_screen.dart';
 import 'student_id_screen.dart';
 
 /// "حسابي" tab: login when signed out, student hub when signed in.
@@ -174,155 +175,251 @@ class _Hub extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const s = student;
+    final top = MediaQuery.paddingOf(context).top;
+    const photoH = 200.0;
     return SafeArea(
+      top: false,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(S.page, 12, S.page, 24),
+        padding: const EdgeInsets.only(bottom: 24),
         children: [
-          // Profile header
-          Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: C.goldSoft,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  s.first.characters.first,
-                  style: T.h1.copyWith(color: C.amber),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(s.name, style: T.h2.copyWith(fontSize: 16.5)),
-                    Text('${s.department} • ${ltr(s.id)}', style: T.small),
-                  ],
-                ),
-              ),
-              RoundButton(
-                Icons.notifications_none_rounded,
-                dot: true,
-                onTap: () => go(context, const NotificationsScreen()),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Digital ID teaser
-          GestureDetector(
-            onTap: () => go(context, const StudentIdScreen()),
-            child: Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [C.navy, C.navyDeep],
-                ),
-                borderRadius: BorderRadius.circular(S.rLg),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'هويتي الجامعية',
-                          style: T.small.copyWith(color: Colors.white70),
-                        ),
-                        Text(
-                          s.id,
-                          style: T.h1.copyWith(
-                            color: Colors.white,
-                            letterSpacing: 1.5,
+          // ── Campus photo + overlapping profile card ──
+          SizedBox(
+            height: photoH + top + 110,
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: photoH + top,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset('$img/college_admin.jpg', fit: BoxFit.cover),
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0x660B1220), Color(0x110B1220)],
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Tag(
-                          s.status,
-                          icon: Icons.circle,
-                          color: const Color(0xFF7CE0B0),
-                          bg: Colors.white.withValues(alpha: .12),
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: top + 8,
+                  left: S.page,
+                  right: S.page,
+                  child: Row(
+                    children: [
+                      Text('حسابي', style: T.h2.copyWith(color: Colors.white)),
+                      const Spacer(),
+                      RoundButton(
+                        Icons.qr_code_2_rounded,
+                        bg: Colors.white,
+                        onTap: () => go(context, const StudentIdScreen()),
+                      ),
+                      const SizedBox(width: 8),
+                      RoundButton(
+                        Icons.notifications_none_rounded,
+                        bg: Colors.white,
+                        dot: true,
+                        onTap: () => go(context, const NotificationsScreen()),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  left: S.page,
+                  right: S.page,
+                  bottom: 0,
+                  child: GestureDetector(
+                    onTap: () => go(context, const StudentIdScreen()),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(S.rLg),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x1A0B1220),
+                            blurRadius: 30,
+                            offset: Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 68,
+                            height: 68,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: C.goldSoft,
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            child: Text(
+                              s.first.characters.first,
+                              style: T.display.copyWith(color: C.amber),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  s.name,
+                                  style: T.h2.copyWith(fontSize: 16),
+                                ),
+                                Text(
+                                  '${ltr(s.id)} • ${s.department}',
+                                  style: T.small,
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Tag(
+                                      'المعدل ${s.gpa}',
+                                      color: C.ink2,
+                                      bg: C.surface,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Tag(
+                                      s.status,
+                                      icon: Icons.circle,
+                                      color: C.green,
+                                      bg: C.greenSoft,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: const Icon(
-                      Icons.qr_code_2_rounded,
-                      color: C.navy,
-                      size: 34,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 14),
-
-          // Quick tiles
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 1.6,
-            children: [
-              _Tile(
-                Icons.account_balance_wallet_outlined,
-                'الرصيد',
-                iqd(balance.remaining),
-                C.red,
-                C.redSoft,
-                () => go(context, const BalanceScreen()),
-              ),
-              _Tile(
-                Icons.local_offer_outlined,
-                'عروض Joy',
-                '${offers.length} عروض متاحة',
-                C.amber,
-                C.amberSoft,
-                () => currentTab.value = 2,
-              ),
-              _Tile(
-                Icons.trending_up_rounded,
-                'المعدل',
-                '${s.gpa}',
-                C.green,
-                C.greenSoft,
-                () {},
-              ),
-              _Tile(
-                Icons.calendar_today_outlined,
-                'الجدول',
-                '3 محاضرات اليوم',
-                C.purple,
-                C.purpleSoft,
-                () {},
-              ),
-            ],
+          const SizedBox(height: 22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: S.page),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Study progress with ring ──
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(S.r),
+                    border: Border.all(color: C.line, width: 1.2),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('تقدّم السنة الدراسية', style: T.h3),
+                            const SizedBox(height: 10),
+                            const _Legend(C.line, 'الوحدات الكلية', '60 وحدة'),
+                            const _Legend(C.navy, 'المنجزة', '36 وحدة'),
+                            const _Legend(C.gold, 'المتبقية', '24 وحدة'),
+                          ],
+                        ),
+                      ),
+                      const ProgressRing(value: .6, size: 104),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // ── Quick tiles ──
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1.6,
+                  children: [
+                    _Tile(
+                      Icons.calendar_month_outlined,
+                      'جدولي',
+                      '3 محاضرات اليوم',
+                      C.navy,
+                      C.navySoft,
+                      () => go(context, const ScheduleScreen()),
+                    ),
+                    _Tile(
+                      Icons.account_balance_wallet_outlined,
+                      'الرصيد',
+                      iqd(balance.remaining),
+                      C.red,
+                      C.redSoft,
+                      () => go(context, const BalanceScreen()),
+                    ),
+                    _Tile(
+                      Icons.local_offer_outlined,
+                      'عروض Joy',
+                      '${offers.length} عروض متاحة',
+                      C.amber,
+                      C.amberSoft,
+                      () => currentTab.value = 2,
+                    ),
+                    _Tile(
+                      Icons.badge_outlined,
+                      'هويتي الجامعية',
+                      ltr(s.id),
+                      C.navy,
+                      C.navySoft,
+                      () => go(context, const StudentIdScreen()),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                Text('الإعدادات', style: T.h3.copyWith(color: C.muted)),
+                const SizedBox(height: 4),
+                const _Settings(showLogout: true),
+              ],
+            ),
           ),
-          const SizedBox(height: 28),
-          Text('الإعدادات', style: T.h3.copyWith(color: C.muted)),
-          const SizedBox(height: 4),
-          const _Settings(showLogout: true),
         ],
       ),
     );
   }
+}
+
+class _Legend extends StatelessWidget {
+  final Color color;
+  final String label, value;
+  const _Legend(this.color, this.label, this.value);
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Text(label, style: T.small.copyWith(color: C.ink2)),
+        const Spacer(),
+        Text(
+          value,
+          style: T.small.copyWith(color: C.ink, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(width: 16),
+      ],
+    ),
+  );
 }
 
 class _Tile extends StatelessWidget {
