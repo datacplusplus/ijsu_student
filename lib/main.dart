@@ -24,7 +24,10 @@ void main() => runApp(const IjsuApp());
 Widget _start() {
   if (!kIsWeb) return const BranchScreen();
   final q = Uri.base.queryParameters;
-  if (q['student'] == '1') loggedIn.value = true;
+  // Joy is for signed-in students only, so its preview links sign in too.
+  if (q['student'] == '1' || q['screen'] == 'joy' || q['screen'] == 'qr') {
+    loggedIn.value = true;
+  }
   return switch (q['screen']) {
     'home' => Shell(initialTab: 0),
     'colleges' => Shell(initialTab: 1),
