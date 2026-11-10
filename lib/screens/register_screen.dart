@@ -80,24 +80,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Step 1 — personal
   int _gender = 0;
+  DateTime? _birth;
   // Step 2 — university
   String _branch = 'IJSU بغداد';
   String _year = '2026 – 2027';
   int _channel = 0;
-  String _dept = 'العلوم الإدارية • إدارة الأعمال';
+  int _college = 0;
+  String _dept = colleges[0].departments[0].name;
   int _stage = 0;
   int _shift = 0;
   int _system = 1;
-  // Step 3 — secondary school
-  int _schoolType = 0;
+  // Step 3 — previous study
+  int _schoolType = 0; // 0 إعدادي · 1 مهني · 2 وقف
+  int _track = 0; // sub-branch of إعدادي / مهني
+
+  static const _channels = [
+    'القبول العام',
+    'ذوي الشهداء',
+    'السجناء السياسيون',
+    'ضحايا الإرهاب',
+    'ذوي الاحتياجات الخاصة',
+    'أبناء الهيئة التدريسية',
+    'أخرى',
+  ];
+
+  Future<void> _pickBirth() async {
+    final d = await showDatePicker(
+      context: context,
+      initialDate: _birth ?? DateTime(2007, 1, 1),
+      firstDate: DateTime(1960),
+      lastDate: DateTime(DateTime.now().year - 15, 12, 31),
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      helpText: 'اختر تاريخ الميلاد',
+      builder: (c, child) => Theme(
+        data: Theme.of(c).copyWith(
+          colorScheme: Theme.of(c).colorScheme.copyWith(primary: C.navy),
+        ),
+        child: child!,
+      ),
+    );
+    if (d != null) setState(() => _birth = d);
+  }
+
   String _gradYear = '2026';
   bool _before2003 = false;
   bool _agree = true;
 
   static const _titles = [
     ('عرّفنا بنفسك', 'البيانات كما في الوثائق الرسمية'),
-    ('دراستك في الجامعة', 'تتغيّر الخيارات تلقائياً حسب القسم'),
-    ('الدراسة الإعدادية', 'خطوة أخيرة قبل تفعيل حسابك'),
+    ('دراستك في الجامعة', 'تتغيّر الأقسام تلقائياً حسب الكلية'),
+    ('الدراسة السابقة', 'خطوة أخيرة قبل تفعيل حسابك'),
   ];
 
   void _next() {
@@ -266,7 +298,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
         onSelect: (i) => setState(() => _gender = i),
       ),
       const FieldLabel('تاريخ الميلاد'),
-      const _Input('يوم / شهر / سنة', icon: Icons.calendar_today_outlined),
+      Material(
+        color: C.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: _pickBirth,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.calendar_month_outlined,
+                  size: 20,
+                  color: C.navy,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    _birth == null
+                        ? 'اختر التاريخ'
+                        : ltr(
+                            '${_birth!.day} / ${_birth!.month} / ${_birth!.year}',
+                          ),
+                    style: _birth == null
+                        ? T.body.copyWith(color: C.muted)
+                        : T.h3.copyWith(fontSize: 14),
+                  ),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded, color: C.muted),
+              ],
+            ),
+          ),
+        ),
+      ),
       const FieldLabel('رقم البطاقة الموحدة'),
       const _Input('0000 0000 0000', number: true),
       const FieldLabel('رقم الهاتف'),
@@ -311,23 +376,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       const FieldLabel('قناة القبول'),
       PillChoice(
-        options: const [
-          'قبول عام',
-          'الوقف الشيعي',
-          'خريجي الفرع المهني',
-          'أخرى',
-        ],
+        options: _channels,
         selected: _channel,
         onSelect: (i) => setState(() => _channel = i),
       ),
+      if (_channel != 0)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            children: [
+              const Icon(Icons.attach_file_rounded, size: 16, color: C.amber),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'سيُطلب منك رفع الوثيقة المؤيدة لهذه القناة لاحقاً.',
+                  style: T.small.copyWith(color: C.amber),
+                ),
+              ),
+            ],
+          ),
+        ),
+      const FieldLabel('الكلية'),
+      SelectField(
+        icon: Icons.account_balance_outlined,
+        value: colleges[_college].name,
+        items: [for (final c in colleges) c.name],
+        onChanged: (v) => setState(() {
+          _college = colleges.indexWhere((c) => c.name == v);
+          _dept = colleges[_college].departments.first.name;
+        }),
+      ),
       const FieldLabel('القسم'),
       SelectField(
+        icon: Icons.school_outlined,
         value: _dept,
-        items: [
-          for (final c in colleges)
-            for (final d in c.departments)
-              '${c.short} • ${d.name.replaceFirst('قسم ', '')}',
-        ],
+        items: [for (final d in colleges[_college].departments) d.name],
         onChanged: (v) => setState(() => _dept = v),
       ),
       const FieldLabel('المرحلة'),
@@ -370,20 +453,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const FieldLabel('الرقم الامتحاني للإعدادية'),
-        const _Input('مثال: 1234567890', number: true),
-        const FieldLabel('نوع الدراسة الإعدادية'),
+        const FieldLabel('نوع الدراسة السابقة'),
         Choice(
           options: const [
-            ('علمي', Icons.science_outlined, true, null),
-            ('أدبي', Icons.menu_book_outlined, true, null),
+            ('إعدادي', Icons.school_outlined, true, null),
             ('مهني', Icons.handyman_outlined, true, null),
-            ('أخرى', Icons.more_horiz_rounded, true, null),
+            ('وقف', Icons.mosque_outlined, true, null),
           ],
           selected: _schoolType,
-          onSelect: (i) => setState(() => _schoolType = i),
+          onSelect: (i) => setState(() {
+            _schoolType = i;
+            _track = 0;
+          }),
         ),
-        const FieldLabel('سنة التخرج من الإعدادية'),
+        if (_schoolType == 0) ...[
+          const FieldLabel('الفرع'),
+          PillChoice(
+            options: const ['علمي تطبيقي', 'علمي أحيائي', 'أدبي'],
+            selected: _track,
+            onSelect: (i) => setState(() => _track = i),
+          ),
+        ] else if (_schoolType == 1) ...[
+          const FieldLabel('الاختصاص'),
+          PillChoice(
+            options: const ['صناعي', 'تجاري', 'زراعي', 'فنون تطبيقية'],
+            selected: _track,
+            onSelect: (i) => setState(() => _track = i),
+          ),
+        ],
+        const FieldLabel('الرقم الامتحاني'),
+        const _Input('مثال: 1234567890', number: true),
+        const FieldLabel('سنة التخرج'),
         SelectField(
           value: _gradYear,
           items: [for (var y = 2026; y >= 2015; y--) '$y'],
@@ -409,7 +509,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 6, right: 4),
           child: Text(
-            'سنة التخرج مطلوبة لخريجي 2003 فما بعد، ولا تُطلب لقناة الوقف.',
+            'سنة التخرج مطلوبة لخريجي 2003 فما بعد، ولا تُطلب لخريجي الوقف.',
             style: T.small.copyWith(fontSize: 11),
           ),
         ),
@@ -460,7 +560,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         Text('أحمد علي حسين', style: T.h3),
                         Text(
-                          '${_dept.split(' • ').last} • المرحلة ${stages[_stage]} • '
+                          '${_dept.replaceFirst('قسم ', '')} • المرحلة ${stages[_stage]} • '
                           '${_shift == 0 ? 'صباحي' : 'مسائي'} • '
                           '${_system == 0 ? 'سنوي' : 'بولونيا'}',
                           style: T.small,
@@ -506,16 +606,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 class _Input extends StatelessWidget {
   final String hint;
   final String? initial;
-  final IconData? icon;
   final bool number;
   final String? prefix;
-  const _Input(
-    this.hint, {
-    this.initial,
-    this.icon,
-    this.number = false,
-    this.prefix,
-  });
+  const _Input(this.hint, {this.initial, this.number = false, this.prefix});
 
   @override
   Widget build(BuildContext context) => TextFormField(
@@ -526,7 +619,6 @@ class _Input extends StatelessWidget {
     decoration: InputDecoration(
       hintText: hint,
       hintTextDirection: number ? TextDirection.ltr : null,
-      suffixIcon: icon != null ? Icon(icon, size: 20) : null,
       prefixIcon: prefix != null
           ? Container(
               width: 70,
