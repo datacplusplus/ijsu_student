@@ -6,6 +6,8 @@ import 'about_screen.dart';
 import 'balance_screen.dart';
 import 'branch_screen.dart';
 import 'contact_screen.dart';
+import 'credentials_screen.dart';
+import 'register_screen.dart';
 import 'notifications_screen.dart';
 import 'shell.dart';
 import 'student_id_screen.dart';
@@ -29,6 +31,18 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   bool _hide = true;
+  bool _showPassword = false;
+
+  /// Google sign-in: first time → registration form, afterwards → straight in.
+  Future<void> _google() async {
+    final picked = await showGoogleChooser(context);
+    if (!picked || !mounted) return;
+    if (registered.value) {
+      loggedIn.value = true;
+    } else {
+      go(context, const RegisterScreen());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,61 +52,115 @@ class _LoginViewState extends State<LoginView> {
         children: [
           const Align(alignment: Alignment.centerRight, child: Logo(size: 60)),
           const SizedBox(height: 20),
-          Text('تسجيل الدخول', style: T.display),
+          Text('بوابة الطالب', style: T.display),
           const SizedBox(height: 4),
           Text(
-            'ادخل إلى بوابة الطالب لعرض بياناتك ورصيدك وعروض Joy.',
+            'سجّل دخولك بحساب Google لعرض بياناتك ورصيدك وعروض Joy.',
             style: T.body,
           ),
           const SizedBox(height: 26),
-          Text('الرقم الجامعي', style: T.h3.copyWith(fontSize: 13.5)),
-          const SizedBox(height: 8),
-          TextField(
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: 'مثال: ${ltr('2026-0148')}',
-              prefixIcon: const Icon(Icons.badge_outlined),
+
+          // Primary: Google
+          OutlinedButton(
+            onPressed: _google,
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.white,
+              side: const BorderSide(color: C.line, width: 1.4),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const GoogleLogo(size: 22),
+                const SizedBox(width: 12),
+                Text(
+                  'المتابعة باستخدام Google',
+                  style: T.h3.copyWith(fontSize: 15),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Row(
             children: [
+              const Icon(Icons.info_outline_rounded, size: 15, color: C.muted),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'كلمة المرور',
-                  style: T.h3.copyWith(fontSize: 13.5),
+                  'أول مرة؟ سنطلب منك إكمال بياناتك الجامعية بعد الدخول.',
+                  style: T.small.copyWith(fontSize: 11.5),
                 ),
               ),
-              Text('نسيت كلمة المرور؟', style: T.label),
             ],
           ),
-          const SizedBox(height: 8),
-          TextField(
-            obscureText: _hide,
-            decoration: InputDecoration(
-              hintText: '••••••••',
-              prefixIcon: const Icon(Icons.lock_outline_rounded),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _hide
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                ),
-                onPressed: () => setState(() => _hide = !_hide),
+          const SizedBox(height: 22),
+          Row(
+            children: [
+              const Expanded(child: Hairline()),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text('أو', style: T.small),
+              ),
+              const Expanded(child: Hairline()),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Secondary: username + password (only for students who set one)
+          if (!_showPassword)
+            TextButton.icon(
+              onPressed: () => setState(() => _showPassword = true),
+              icon: const Icon(Icons.key_rounded, size: 18, color: C.navy),
+              label: Text(
+                'الدخول باسم المستخدم وكلمة المرور',
+                style: T.h3.copyWith(color: C.navy, fontSize: 14),
+              ),
+            )
+          else ...[
+            const FieldLabel('اسم المستخدم'),
+            TextField(
+              textDirection: TextDirection.ltr,
+              decoration: const InputDecoration(
+                hintText: 'username',
+                hintTextDirection: TextDirection.ltr,
+                prefixIcon: Icon(Icons.alternate_email_rounded),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: () => loggedIn.value = true,
-            child: const Text('دخول'),
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: () => loggedIn.value = true,
-            icon: const Icon(Icons.fingerprint_rounded, size: 24),
-            label: const Text('الدخول بالبصمة'),
-          ),
+            Row(
+              children: [
+                const Expanded(child: FieldLabel('كلمة المرور')),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text('نسيت كلمة المرور؟', style: T.label),
+                ),
+              ],
+            ),
+            TextField(
+              obscureText: _hide,
+              decoration: InputDecoration(
+                hintText: '••••••••',
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _hide
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                  ),
+                  onPressed: () => setState(() => _hide = !_hide),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            FilledButton(
+              onPressed: () => loggedIn.value = true,
+              child: const Text('دخول'),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'اسم المستخدم وكلمة المرور متاحان بعد أول دخول عبر Google، من الإعدادات.',
+              textAlign: TextAlign.center,
+              style: T.small.copyWith(fontSize: 11.5),
+            ),
+          ],
           const SizedBox(height: 32),
           Text('عام', style: T.h3.copyWith(color: C.muted)),
           const SizedBox(height: 4),
@@ -399,6 +467,26 @@ class _SettingsState extends State<_Settings> {
           onTap: () => go(context, const ContactScreen()),
         ),
         if (widget.showLogout) ...[
+          const Hairline(),
+          ValueListenableBuilder<bool>(
+            valueListenable: hasPassword,
+            builder: (_, has, _) => _row(
+              Icons.key_rounded,
+              'اسم المستخدم وكلمة المرور',
+              value: has ? 'تغيير' : 'إضافة',
+              onTap: () => go(context, const CredentialsScreen()),
+            ),
+          ),
+          const Hairline(),
+          _row(
+            Icons.link_rounded,
+            'حساب Google',
+            value: 'مرتبط',
+            trailing: const Padding(
+              padding: EdgeInsetsDirectional.only(start: 6),
+              child: GoogleLogo(size: 18),
+            ),
+          ),
           const Hairline(),
           _row(
             Icons.logout_rounded,

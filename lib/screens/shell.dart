@@ -9,6 +9,13 @@ import 'account_screen.dart';
 /// Whether the student is signed in (demo state, shared across screens).
 final loggedIn = ValueNotifier<bool>(false);
 
+/// Whether the student has completed first-time registration (demo state).
+/// First Google sign-in → registration form; later sign-ins go straight in.
+final registered = ValueNotifier<bool>(false);
+
+/// Whether the student has set an optional username + password.
+final hasPassword = ValueNotifier<bool>(false);
+
 /// Lets any screen switch the bottom tab.
 final currentTab = ValueNotifier<int>(0);
 

@@ -382,7 +382,7 @@ class BackBtn extends StatelessWidget {
   const BackBtn({super.key, this.bg = C.surface});
   @override
   Widget build(BuildContext context) => RoundButton(
-    Icons.arrow_forward_rounded,
+    Icons.arrow_back_rounded,
     bg: bg,
     onTap: () => Navigator.maybePop(context),
   );
@@ -454,4 +454,225 @@ class Hairline extends StatelessWidget {
   const Hairline({super.key});
   @override
   Widget build(BuildContext context) => const Divider(height: 1);
+}
+
+/// Four-colour Google "G" mark.
+class GoogleLogo extends StatelessWidget {
+  final double size;
+  const GoogleLogo({super.key, this.size = 22});
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(size: Size.square(size), painter: _GPainter());
+}
+
+class _GPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size s) {
+    final w = s.width * .2;
+    final r = Rect.fromLTWH(w / 2, w / 2, s.width - w, s.height - w);
+    Paint p(Color c) => Paint()
+      ..color = c
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w;
+    const deg = 3.14159265 / 180;
+    canvas.drawArc(r, -40 * deg, -100 * deg, false, p(const Color(0xFFEA4335)));
+    canvas.drawArc(r, -140 * deg, -90 * deg, false, p(const Color(0xFFFBBC05)));
+    canvas.drawArc(r, 130 * deg, -90 * deg, false, p(const Color(0xFF34A853)));
+    canvas.drawArc(r, 40 * deg, -40 * deg, false, p(const Color(0xFF4285F4)));
+    canvas.drawRect(
+      Rect.fromLTWH(s.width / 2, s.height / 2 - w / 2, s.width / 2 - w / 4, w),
+      Paint()..color = const Color(0xFF4285F4),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Field label above an input.
+class FieldLabel extends StatelessWidget {
+  final String text;
+  const FieldLabel(this.text, {super.key});
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 8, top: 16),
+    child: Text(text, style: T.h3.copyWith(fontSize: 13.5)),
+  );
+}
+
+/// Row of equal-width selectable boxes (gender, study type…).
+/// An option is (label, icon?, enabled?, note?).
+class Choice extends StatelessWidget {
+  final List<(String, IconData?, bool, String?)> options;
+  final int selected;
+  final ValueChanged<int> onSelect;
+  const Choice({
+    super.key,
+    required this.options,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      for (var i = 0; i < options.length; i++) ...[
+        if (i > 0) const SizedBox(width: 8),
+        Expanded(child: _box(i)),
+      ],
+    ],
+  );
+
+  Widget _box(int i) {
+    final (label, icon, enabled, note) = options[i];
+    final sel = i == selected;
+    return GestureDetector(
+      onTap: enabled ? () => onSelect(i) : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        height: icon != null ? 76 : 54,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: !enabled
+              ? Colors.white
+              : sel
+              ? C.navySoft
+              : C.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: sel ? C.navy : (enabled ? Colors.transparent : C.line),
+            width: sel ? 1.4 : 1.2,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 20, color: sel ? C.navy : C.ink2),
+              const SizedBox(height: 4),
+            ],
+            Text(
+              label,
+              style: T.h3.copyWith(
+                fontSize: 14,
+                color: !enabled ? C.muted : (sel ? C.navy : C.ink2),
+                fontWeight: sel ? FontWeight.w800 : FontWeight.w600,
+              ),
+            ),
+            if (note != null) Text(note, style: T.small.copyWith(fontSize: 10)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Wrap of pill options (admission channel…).
+class PillChoice extends StatelessWidget {
+  final List<String> options;
+  final int selected;
+  final ValueChanged<int> onSelect;
+  const PillChoice({
+    super.key,
+    required this.options,
+    required this.selected,
+    required this.onSelect,
+  });
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: 8,
+    runSpacing: 8,
+    children: [
+      for (var i = 0; i < options.length; i++)
+        GestureDetector(
+          onTap: () => onSelect(i),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
+            decoration: BoxDecoration(
+              color: i == selected ? C.navy : C.surface,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Text(
+              options[i],
+              style: T.h3.copyWith(
+                fontSize: 13.5,
+                color: i == selected ? Colors.white : C.ink2,
+              ),
+            ),
+          ),
+        ),
+    ],
+  );
+}
+
+/// Read-only dropdown-looking field (demo: opens a simple bottom sheet).
+class SelectField extends StatelessWidget {
+  final String value;
+  final List<String> items;
+  final ValueChanged<String> onChanged;
+  final IconData? icon;
+  const SelectField({
+    super.key,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: C.surface,
+    borderRadius: BorderRadius.circular(16),
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () async {
+        final v = await showModalBottomSheet<String>(
+          context: context,
+          backgroundColor: Colors.white,
+          showDragHandle: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(S.rLg)),
+          ),
+          builder: (c) => SafeArea(
+            child: ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.fromLTRB(S.page, 0, S.page, 16),
+              children: [
+                for (final it in items)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(it, style: T.h3),
+                    trailing: it == value
+                        ? const Icon(Icons.check_rounded, color: C.navy)
+                        : null,
+                    onTap: () => Navigator.pop(c, it),
+                  ),
+              ],
+            ),
+          ),
+        );
+        if (v != null) onChanged(v);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 20, color: C.muted),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: Text(
+                value,
+                overflow: TextOverflow.ellipsis,
+                style: T.h3.copyWith(fontSize: 14),
+              ),
+            ),
+            const Icon(Icons.keyboard_arrow_down_rounded, color: C.muted),
+          ],
+        ),
+      ),
+    ),
+  );
 }

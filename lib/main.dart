@@ -7,6 +7,8 @@ import 'screens/assistant_screen.dart';
 import 'screens/balance_screen.dart';
 import 'screens/branch_screen.dart';
 import 'screens/contact_screen.dart';
+import 'screens/credentials_screen.dart';
+import 'screens/register_screen.dart';
 import 'screens/department_screen.dart';
 import 'screens/news_detail_screen.dart';
 import 'screens/notifications_screen.dart';
@@ -41,6 +43,11 @@ Widget _start() {
     'id' => const StudentIdScreen(),
     'balance' => const BalanceScreen(),
     'qr' => OfferQrScreen(offer: offers[0]),
+    'register' => RegisterScreen(
+      initialStep: ((int.tryParse(q['step'] ?? '1') ?? 1) - 1).clamp(0, 2),
+    ),
+    'password' => const CredentialsScreen(afterRegistration: true),
+    'welcome' => const WelcomeScreen(),
     _ => const BranchScreen(),
   };
 }
