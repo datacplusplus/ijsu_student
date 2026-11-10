@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IJSU Student Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1B2F6B; --navy2: #2D4C93; --gold: #C9A24A;
+      --bg: #F7F5F0; --ink: #151B33; --muted: #7A8099; --line: #ECE9E1;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body { font-family: 'Cairo', system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+    header {
+      background: linear-gradient(135deg, var(--navy), var(--navy2));
+      color: #fff; padding: 48px 16px 64px; text-align: center;
+      border-radius: 0 0 40px 40px; position: relative; overflow: hidden;
+    }
+    header::before {
+      content: ""; position: absolute; inset: 0; opacity: .07;
+      background-image:
+        linear-gradient(45deg, #fff 1px, transparent 1px),
+        linear-gradient(-45deg, #fff 1px, transparent 1px);
+      background-size: 56px 56px;
+    }
+    header > * { position: relative; }
+    h1 { font-size: clamp(26px, 5vw, 40px); font-weight: 900; }
+    header p { opacity: .8; margin-top: 6px; font-size: 16px; }
+    .badge {
+      display: inline-block; background: var(--gold); color: var(--navy);
+      font-weight: 800; padding: 4px 14px; border-radius: 20px; font-size: 13px; margin-bottom: 14px;
+    }
+    .actions { margin-top: 22px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none; font-weight: 800; padding: 12px 22px; border-radius: 16px;
+      background: #fff; color: var(--navy);
+    }
+    .btn.ghost { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.4); }
+    main { max-width: 1400px; margin: -28px auto 0; padding: 0 16px 60px; position: relative; }
+    .grid {
+      display: grid; gap: 28px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      justify-items: center;
+    }
+    .item { width: 100%; max-width: 360px; }
+    .phone {
+      width: 100%; aspect-ratio: 390 / 820; background: #111; border-radius: 44px;
+      padding: 10px; box-shadow: 0 24px 48px rgba(27,47,107,.18);
+    }
+    .phone iframe {
+      width: 100%; height: 100%; border: 0; border-radius: 34px; background: var(--bg); display: block;
+    }
+    .cap { display: flex; align-items: center; gap: 10px; margin: 16px 6px 0; }
+    .cap .bar { width: 4px; height: 22px; background: var(--gold); border-radius: 4px; }
+    .cap h2 { font-size: 18px; font-weight: 800; }
+    .cap a { margin-inline-start: auto; color: var(--navy); font-weight: 700; font-size: 14px; text-decoration: none; }
+    .item p { color: var(--muted); font-size: 14px; margin: 4px 20px 0; line-height: 1.7; }
+    footer { text-align: center; color: var(--muted); font-size: 13px; padding: 0 16px 40px; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="badge">تصميم مقترح</span>
+    <h1>تطبيق طالب جامعة الإمام جعفر الصادق</h1>
+    <p>تسجيل دخول الطالب • البيانات والرصيد • عروض Joy مع رمز خصم يتجدد كل 30 ثانية</p>
+    <div class="actions">
+      <a class="btn" href="./" target="_blank">فتح التطبيق كاملاً</a>
+      <a class="btn ghost" href="https://github.com/datacplusplus/ijsu_student" target="_blank">الكود على GitHub</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer>كل شاشة تفاعلية — جرّب الضغط والتمرير داخلها. البيانات تجريبية.</footer>
+
+  <script>
+    const screens = [
+      ['login',   'تسجيل الدخول', 'الرقم الجامعي وكلمة المرور، تذكرني، والدخول بالبصمة.'],
+      ['home',    'الرئيسية',      'هوية مصغرة، المعدل والحضور، ملخص الأقساط، الخدمات وعرض Joy.'],
+      ['balance', 'الرصيد والأقساط', 'المبلغ المتبقي، القسط القادم مع زر الدفع، وسجل الدفعات.'],
+      ['joy',     'عروض Joy',      'عرض الأسبوع، البحث، التصنيفات، وقائمة خصومات المتاجر.'],
+      ['qr',      'رمز الخصم',     'رمز QR يتجدد كل 30 ثانية مع عداد تنازلي يحمرّ في آخر 5 ثوانٍ.'],
+      ['profile', 'هويتي الجامعية', 'الهوية الرقمية، المرحلة ونوع الدراسة، والبيانات الأكاديمية.'],
+    ];
+    const grid = document.getElementById('grid');
+    for (const [key, title, desc] of screens) {
+      const url = './?screen=' + key;
+      const el = document.createElement('section');
+      el.className = 'item';
+      el.innerHTML = `
+        <div class="phone"><iframe loading="lazy" title="${title}" src="${url}"></iframe></div>
+        <div class="cap"><span class="bar"></span><h2>${title}</h2>
+          <a href="${url}" target="_blank">فتح ↗</a></div>
+        <p>${desc}</p>`;
+      grid.appendChild(el);
+    }
+  </script>
+</body>
+</html>
