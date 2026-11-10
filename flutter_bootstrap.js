@@ -35,8 +35,12 @@ if (!window._flutter) {
 }
 _flutter.buildConfig = {"engineRevision":"42d3d75a56efe1a2e9902f52dc8006099c45d937","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
 
-_flutter.loader.load({
-  serviceWorkerSettings: {
-    serviceWorkerVersion: "3530317550" /* Flutter's service worker is deprecated and will be removed in a future Flutter release. */
-  }
-});
+
+// Cache-bust the app code: every build gets a new version stamp, so after a
+// deploy browsers download the new main.dart.js instead of a cached copy.
+// __BUILD_ID__ is replaced after each build (see WORK_SUMMARY.md, section 9).
+for (const b of _flutter.buildConfig.builds) {
+  if (b.mainJsPath) b.mainJsPath += "?v=__BUILD_ID__";
+}
+
+_flutter.loader.load();
