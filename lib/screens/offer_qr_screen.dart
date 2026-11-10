@@ -2,18 +2,17 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '../mock_data.dart';
+import '../data.dart';
 import '../theme.dart';
-import '../widgets.dart';
+import '../ui.dart';
 
 /// Discount QR that refreshes every 30 seconds for the shop to scan.
 ///
-/// UI only: [_newCode] makes a random demo string. In the real app, ask
-/// your server for a signed one-time token each time the timer resets.
+/// UI only: [_newCode] makes a random demo string. In production, request a
+/// signed one-time token from the server each time the timer resets.
 class OfferQrScreen extends StatefulWidget {
   final Offer offer;
   const OfferQrScreen({super.key, required this.offer});
-
   @override
   State<OfferQrScreen> createState() => _OfferQrScreenState();
 }
@@ -21,13 +20,16 @@ class OfferQrScreen extends StatefulWidget {
 class _OfferQrScreenState extends State<OfferQrScreen> {
   static const _period = 30;
   late Timer _timer;
-  int _secondsLeft = _period;
+  int _left = _period;
   late String _code = _newCode();
 
   String _newCode() {
     final r = Random();
-    final nonce = List.generate(12, (_) => r.nextInt(16).toRadixString(16)).join();
-    return 'IJSU|${demoStudent.id}|${widget.offer.shop.hashCode}|$nonce';
+    final nonce = List.generate(
+      12,
+      (_) => r.nextInt(16).toRadixString(16),
+    ).join();
+    return 'IJSU|${student.id}|${widget.offer.shop.hashCode}|$nonce';
   }
 
   @override
@@ -35,11 +37,11 @@ class _OfferQrScreenState extends State<OfferQrScreen> {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
-        if (_secondsLeft <= 1) {
-          _secondsLeft = _period;
+        if (_left <= 1) {
+          _left = _period;
           _code = _newCode();
         } else {
-          _secondsLeft--;
+          _left--;
         }
       });
     });
@@ -54,178 +56,183 @@ class _OfferQrScreenState extends State<OfferQrScreen> {
   @override
   Widget build(BuildContext context) {
     final o = widget.offer;
-    const s = demoStudent;
-    final urgent = _secondsLeft <= 5;
+    final urgent = _left <= 5;
+    final accent = urgent ? C.red : C.navy;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: const CircleBackButton(),
-        leadingWidth: 64,
-        title: const Text('رمز الخصم',
-            style: TextStyle(fontWeight: FontWeight.w800)),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-        children: [
-          // ---------- Shop ----------
-          SoftCard(
-            child: Row(
-              children: [
-                IconTile(o.icon, color: o.color, background: o.soft, size: 52),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(o.shop,
-                          style: const TextStyle(
-                              fontSize: 16.5, fontWeight: FontWeight.w800)),
-                      Text(o.description,
-                          style: const TextStyle(
-                              color: AppColors.muted, fontSize: 13)),
-                    ],
-                  ),
-                ),
-                Text('${o.discount}%',
-                    style: const TextStyle(
-                        color: AppColors.navy,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // ---------- QR ----------
-          SoftCard(
-            padding: const EdgeInsets.fromLTRB(22, 26, 22, 20),
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppColors.line),
-                  ),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 450),
-                    transitionBuilder: (child, anim) => FadeTransition(
-                      opacity: anim,
-                      child: ScaleTransition(
-                          scale: Tween(begin: 0.94, end: 1.0).animate(anim),
-                          child: child),
+      backgroundColor: C.surface,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 24),
+          children: [
+            const PageHeader('رمز الخصم'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  // Shop
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(S.r),
                     ),
-                    child: QrImageView(
-                      key: ValueKey(_code),
-                      data: _code,
-                      size: 230,
-                      errorCorrectionLevel: QrErrorCorrectLevel.H,
-                      eyeStyle: const QrEyeStyle(
-                          eyeShape: QrEyeShape.square, color: AppColors.ink),
-                      dataModuleStyle: const QrDataModuleStyle(
-                          dataModuleShape: QrDataModuleShape.circle,
-                          color: AppColors.ink),
-                      embeddedImageStyle:
-                          const QrEmbeddedImageStyle(size: Size(46, 46)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 22),
-
-                // countdown bar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(end: _secondsLeft / _period),
-                    duration: const Duration(milliseconds: 900),
-                    builder: (_, v, _) => LinearProgressIndicator(
-                      value: v,
-                      minHeight: 7,
-                      backgroundColor: AppColors.iconTile,
-                      color: urgent ? AppColors.red : AppColors.navy,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.autorenew_rounded,
-                        size: 16,
-                        color: urgent ? AppColors.red : AppColors.muted),
-                    const SizedBox(width: 6),
-                    Text.rich(
-                      TextSpan(
-                        text: 'يتجدد الرمز خلال ',
-                        style: const TextStyle(color: AppColors.muted),
-                        children: [
-                          TextSpan(
-                            text: '$_secondsLeft',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                color:
-                                    urgent ? AppColors.red : AppColors.ink),
+                    child: Row(
+                      children: [
+                        IconBox(o.icon, color: o.color, bg: o.soft, size: 50),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(o.shop, style: T.h3),
+                              Text(o.description, style: T.small),
+                            ],
                           ),
-                          const TextSpan(text: ' ثانية لحمايتك'),
-                        ],
-                      ),
+                        ),
+                        Text(
+                          '${o.discount}%',
+                          style: T.display.copyWith(
+                            color: C.navy,
+                            fontSize: 30,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                const _DashedLine(),
-                const SizedBox(height: 16),
+                  ),
+                  const SizedBox(height: 12),
 
-                // student
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(s.name,
-                              style: const TextStyle(
-                                  fontSize: 15.5,
-                                  fontWeight: FontWeight.w800)),
-                          Text('${s.branch} • ${ltr(s.id)}',
-                              style: const TextStyle(
-                                  color: AppColors.muted, fontSize: 12.5)),
-                        ],
-                      ),
+                  // QR card
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(22, 26, 22, 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(S.rLg),
                     ),
-                    Pill('${o.usesLeft} من ${o.usesTotal} متبقية',
-                        color: AppColors.green,
-                        background: AppColors.greenSoft),
-                  ],
-                ),
-              ],
+                    child: Column(
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 450),
+                          transitionBuilder: (child, a) => FadeTransition(
+                            opacity: a,
+                            child: ScaleTransition(
+                              scale: Tween(begin: .94, end: 1.0).animate(a),
+                              child: child,
+                            ),
+                          ),
+                          child: Stack(
+                            key: ValueKey(_code),
+                            alignment: Alignment.center,
+                            children: [
+                              QrImageView(
+                                data: _code,
+                                size: 240,
+                                errorCorrectionLevel: QrErrorCorrectLevel.H,
+                                eyeStyle: const QrEyeStyle(
+                                  eyeShape: QrEyeShape.square,
+                                  color: C.ink,
+                                ),
+                                dataModuleStyle: const QrDataModuleStyle(
+                                  dataModuleShape: QrDataModuleShape.circle,
+                                  color: C.ink,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Logo(size: 44),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(end: _left / _period),
+                            duration: const Duration(milliseconds: 900),
+                            builder: (_, v, _) => LinearProgressIndicator(
+                              value: v,
+                              minHeight: 6,
+                              backgroundColor: C.surface,
+                              color: accent,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text.rich(
+                          TextSpan(
+                            text: 'يتجدد الرمز خلال ',
+                            style: T.small.copyWith(color: C.ink2),
+                            children: [
+                              TextSpan(
+                                text: '$_left',
+                                style: T.h3.copyWith(color: accent),
+                              ),
+                              const TextSpan(text: ' ثانية لحمايتك'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        const _Dashed(),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(student.name, style: T.h3),
+                                  Text(
+                                    '${student.branch} • ${ltr(student.id)}',
+                                    style: T.small,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Tag(
+                              '${o.usesLeft} من ${o.usesTotal} متبقية',
+                              color: C.green,
+                              bg: C.greenSoft,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'اعرض الرمز للبائع ليمسحه قبل الدفع • صالح حتى ${o.validUntil}',
+                    textAlign: TextAlign.center,
+                    style: T.small,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 18),
-          Text('اعرض الرمز للبائع ليمسحه قبل الدفع • صالح حتى ${o.validUntil}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.muted, fontSize: 13)),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _DashedLine extends StatelessWidget {
-  const _DashedLine();
-
+class _Dashed extends StatelessWidget {
+  const _Dashed();
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (_, c) {
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (_, c) {
       final n = (c.maxWidth / 9).floor();
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: List.generate(
-            n,
-            (_) => Container(
-                width: 5, height: 1.4, color: const Color(0xFFD9D6CE))),
+          n,
+          (_) => Container(width: 5, height: 1.4, color: C.line),
+        ),
       );
-    });
-  }
+    },
+  );
 }

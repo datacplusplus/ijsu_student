@@ -1,89 +1,160 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// IJSU brand palette — matches the existing app (navy + gold on cream).
-class AppColors {
-  static const navy = Color(0xFF1B2F6B);
-  static const navyLight = Color(0xFF2D4C93);
-  static const gold = Color(0xFFC9A24A);
-  static const goldSoft = Color(0xFFF6EBD0);
-  static const bg = Color(0xFFF7F5F0);
-  static const card = Colors.white;
-  static const ink = Color(0xFF151B33);
-  static const muted = Color(0xFF7A8099);
-  static const line = Color(0xFFECE9E1);
-  static const iconTile = Color(0xFFEDF0F7);
-  static const green = Color(0xFF1F9D6B);
-  static const greenSoft = Color(0xFFE3F5EC);
-  static const red = Color(0xFFD64545);
-  static const redSoft = Color(0xFFFBE7E7);
-  static const purple = Color(0xFF6A4BC4);
-  static const purpleSoft = Color(0xFFEEE9FB);
+/// IJSU design system — clean white, editorial, pastel accents.
+class C {
+  // Brand
+  static const navy = Color(0xFF1E3A8A);
+  static const navyDeep = Color(0xFF14275E);
+  static const navySoft = Color(0xFFEAF0FF);
+  static const gold = Color(0xFFD4A23C);
+  static const goldSoft = Color(0xFFFFF5DC);
 
-  static const heroGradient = LinearGradient(
-    begin: Alignment.topRight,
-    end: Alignment.bottomLeft,
-    colors: [navy, navyLight],
+  // Neutrals
+  static const bg = Colors.white;
+  static const surface = Color(0xFFF4F6FA);
+  static const line = Color(0xFFEDEFF4);
+  static const ink = Color(0xFF0B1220);
+  static const ink2 = Color(0xFF475069);
+  static const muted = Color(0xFF8A93A6);
+
+  // Pastel accents
+  static const green = Color(0xFF12A150);
+  static const greenSoft = Color(0xFFE6F6EC);
+  static const purple = Color(0xFF6D4AE0);
+  static const purpleSoft = Color(0xFFF0EBFF);
+  static const amber = Color(0xFFB7791F);
+  static const amberSoft = Color(0xFFFFF4DB);
+  static const red = Color(0xFFE5484D);
+  static const redSoft = Color(0xFFFDECEC);
+  static const teal = Color(0xFF0E8C8C);
+  static const tealSoft = Color(0xFFE2F5F4);
+}
+
+/// Spacing & radius tokens.
+class S {
+  static const page = 20.0;
+  static const r = 20.0;
+  static const rLg = 28.0;
+}
+
+/// Text styles.
+class T {
+  static TextStyle get display => GoogleFonts.alexandria(
+    fontSize: 28,
+    fontWeight: FontWeight.w800,
+    color: C.ink,
+    height: 1.35,
+  );
+  static TextStyle get h1 => GoogleFonts.alexandria(
+    fontSize: 22,
+    fontWeight: FontWeight.w800,
+    color: C.ink,
+    height: 1.4,
+  );
+  static TextStyle get h2 => GoogleFonts.alexandria(
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: C.ink,
+    height: 1.45,
+  );
+  static TextStyle get h3 => GoogleFonts.alexandria(
+    fontSize: 15,
+    fontWeight: FontWeight.w700,
+    color: C.ink,
+    height: 1.55,
+  );
+  static TextStyle get body => GoogleFonts.alexandria(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: C.ink2,
+    height: 1.8,
+  );
+  static TextStyle get small => GoogleFonts.alexandria(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: C.muted,
+    height: 1.5,
+  );
+  static TextStyle get label => GoogleFonts.alexandria(
+    fontSize: 12.5,
+    fontWeight: FontWeight.w600,
+    color: C.navy,
   );
 }
 
-class AppTheme {
-  static ThemeData light() {
-    final base = ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.navy,
-        primary: AppColors.navy,
-        secondary: AppColors.gold,
-        surface: AppColors.bg,
+ThemeData buildTheme() {
+  final base = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: C.navy,
+      primary: C.navy,
+      secondary: C.gold,
+      surface: C.bg,
+    ),
+    scaffoldBackgroundColor: C.bg,
+    splashFactory: InkSparkle.splashFactory,
+  );
+  return base.copyWith(
+    textTheme: GoogleFonts.alexandriaTextTheme(
+      base.textTheme,
+    ).apply(bodyColor: C.ink, displayColor: C.ink),
+    appBarTheme: AppBarTheme(
+      backgroundColor: C.bg,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: true,
+      foregroundColor: C.ink,
+      titleTextStyle: T.h2,
+    ),
+    dividerTheme: const DividerThemeData(color: C.line, space: 1),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: C.surface,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
       ),
-      scaffoldBackgroundColor: AppColors.bg,
-    );
-    return base.copyWith(
-      textTheme: GoogleFonts.cairoTextTheme(base.textTheme).apply(
-        bodyColor: AppColors.ink,
-        displayColor: AppColors.ink,
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: C.navy, width: 1.4),
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+      hintStyle: GoogleFonts.alexandria(color: C.muted, fontSize: 14),
+      prefixIconColor: C.muted,
+      suffixIconColor: C.muted,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: C.navy,
+        foregroundColor: Colors.white,
+        minimumSize: const Size.fromHeight(56),
         elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        foregroundColor: AppColors.ink,
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.line),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.line),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.navy, width: 1.4),
-        ),
-        hintStyle: const TextStyle(color: AppColors.muted),
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.navy,
-          foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(58),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          textStyle: GoogleFonts.cairo(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-          ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        textStyle: GoogleFonts.alexandria(
+          fontSize: 15.5,
+          fontWeight: FontWeight.w700,
         ),
       ),
-    );
-  }
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: C.ink,
+        minimumSize: const Size.fromHeight(56),
+        side: const BorderSide(color: C.line, width: 1.2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        textStyle: GoogleFonts.alexandria(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
+  );
 }
